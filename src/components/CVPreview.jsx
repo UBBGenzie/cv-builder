@@ -14,7 +14,7 @@ export default function CVPreview() {
   } = useCVStore();
 
   return (
-    <div style={{ fontFamily: 'sans-serif' }}>
+    <div id="cv-preview" style={{ fontFamily: 'sans-serif' }}>
       {/* NAGŁÓWEK – zdjęcie i dane */}
       <div
         style={{

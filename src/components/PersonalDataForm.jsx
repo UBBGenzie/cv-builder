@@ -18,6 +18,18 @@ export default function PersonalDataForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result;
+      setFormData((prev) => ({ ...prev, picture: base64 }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <input
@@ -56,12 +68,10 @@ export default function PersonalDataForm() {
         value={formData.portfolio}
         onChange={handleChange}
       />
-      <input
-        name="picture"
-        placeholder="Link do zdjęcia"
-        value={formData.picture}
-        onChange={handleChange}
-      />
+      <label>
+        Zdjęcie (plik):
+        <input type="file" accept="image/*" onChange={handleFileUpload} />
+      </label>
       <textarea
         name="summary"
         placeholder="Podsumowanie / Bio"
