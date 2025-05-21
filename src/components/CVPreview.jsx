@@ -9,45 +9,80 @@ export default function CVPreview() {
     education,
     projects,
     skills,
+    languages,
     certifications,
   } = useCVStore();
 
   return (
     <div style={{ fontFamily: 'sans-serif' }}>
-      <h1 style={{ fontSize: '28px', marginBottom: '0.25rem' }}>
-        {personalData.firstName} {personalData.lastName}
-      </h1>
-      <p style={{ margin: 0 }}>
-        {personalData.phone} | {personalData.email}
-      </p>
-      {personalData.portfolio && (
-        <p>
-          <a href={personalData.portfolio}>{personalData.portfolio}</a>
-        </p>
+      {/* NAGŁÓWEK – zdjęcie i dane */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '2rem',
+          alignItems: 'center',
+          marginBottom: '2rem',
+        }}
+      >
+        {personalData.picture && (
+          <img
+            src={personalData.picture}
+            alt="Zdjęcie profilowe"
+            style={{
+              width: '120px',
+              height: '120px',
+              objectFit: 'cover',
+              borderRadius: '8px',
+            }}
+          />
+        )}
+        <div>
+          <h1 style={{ fontSize: '24px', margin: 0 }}>
+            {personalData.fullName}
+          </h1>
+          {personalData.headline && (
+            <p style={{ fontStyle: 'italic', margin: '0.25rem 0' }}>
+              {personalData.headline}
+            </p>
+          )}
+          <p style={{ margin: 0 }}>
+            {[
+              personalData.phone,
+              personalData.email,
+              personalData.portfolio && (
+                <a key="portfolio" href={personalData.portfolio}>
+                  {personalData.portfolio}
+                </a>
+              ),
+            ]
+              .filter(Boolean)
+              .reduce((acc, item, index, arr) => {
+                acc.push(item);
+                if (index < arr.length - 1) acc.push(' | ');
+                return acc;
+              }, [])}
+          </p>
+        </div>
+      </div>
+
+      {personalData.summary && (
+        <p style={{ marginBottom: '2rem' }}>{personalData.summary}</p>
       )}
 
       <hr style={{ margin: '1.5rem 0' }} />
 
       {/* Profiles */}
-      {(profile.github || profile.linkedin || profile.website) && (
+      {Object.entries(profile).filter(([_, url]) => url?.trim()).length > 0 && (
         <>
           <h3>Profiles</h3>
           <ul>
-            {profile.github && (
-              <li>
-                GitHub: <a href={profile.github}>{profile.github}</a>
-              </li>
-            )}
-            {profile.linkedin && (
-              <li>
-                LinkedIn: <a href={profile.linkedin}>{profile.linkedin}</a>
-              </li>
-            )}
-            {profile.website && (
-              <li>
-                Website: <a href={profile.website}>{profile.website}</a>
-              </li>
-            )}
+            {Object.entries(profile)
+              .filter(([_, url]) => url?.trim() !== '')
+              .map(([network, url], i) => (
+                <li key={i}>
+                  <strong>{network}</strong>: <a href={url}>{url}</a>
+                </li>
+              ))}
           </ul>
         </>
       )}
@@ -77,7 +112,8 @@ export default function CVPreview() {
             <div key={i}>
               <strong>{edu.degree}</strong> – {edu.field} ({edu.dateRange})
               <br />
-              {edu.school} ({edu.mode})
+              {edu.school} ({edu.mode})<br />
+              {edu.summary && <p>{edu.summary}</p>}
             </div>
           ))}
         </>
@@ -95,6 +131,8 @@ export default function CVPreview() {
               <em>{proj.techStack}</em>
               <br />
               {proj.link && <a href={proj.link}>{proj.link}</a>}
+              <br />
+              {proj.summary && <p>{proj.summary}</p>}
             </div>
           ))}
         </>
@@ -120,9 +158,30 @@ export default function CVPreview() {
                   background: '#eee',
                   padding: '0.5rem 1rem',
                   borderRadius: '20px',
+                  textAlign: 'center',
                 }}
               >
-                {s}
+                <strong>{s.name}</strong>
+                <br />
+                {s.description}
+                <br />
+                {renderLevelDots(s.level)}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {/* Languages */}
+      {languages.length > 0 && (
+        <>
+          <h3>Languages</h3>
+          <ul>
+            {languages.map((lang, i) => (
+              <li key={i}>
+                <strong>{lang.name}</strong> {lang.description}
+                <br />
+                {renderLevelDots(lang.level)}
               </li>
             ))}
           </ul>
@@ -137,10 +196,29 @@ export default function CVPreview() {
             <div key={i}>
               <strong>{cert.title}</strong> – {cert.issuer} ({cert.date})<br />
               {cert.link && <a href={cert.link}>{cert.link}</a>}
+              <br />
+              {cert.description && <p>{cert.description}</p>}
             </div>
           ))}
         </>
       )}
     </div>
   );
+}
+
+function renderLevelDots(level) {
+  const total = 5;
+  return Array.from({ length: total }, (_, i) => (
+    <span
+      key={i}
+      style={{
+        display: 'inline-block',
+        width: '12px',
+        height: '12px',
+        borderRadius: '50%',
+        marginRight: '4px',
+        backgroundColor: i < level ? '#333' : '#ccc',
+      }}
+    />
+  ));
 }
