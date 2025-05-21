@@ -1,12 +1,13 @@
 'use client';
 import PersonalDataForm from '../components/PersonalDataForm';
-import ProfileForm from '../components/ProfileForm';
-import ExperienceForm from '../components/ExperienceForm';
-import EducationForm from '../components/EducationForm';
-import ProjectsForm from '../components/ProjectsForm';
-import SkillsForm from '../components/SkillsForm';
-import CertificationForm from '../components/CertificationForm';
 import CVPreview from '../components/CVPreview';
+import ExperiencePopup from '../components/ExperiencePopup';
+import EducationPopup from '../components/EducationPopup';
+import ProfilePopup from '../components/ProfilePopup';
+import ProjectsPopup from '../components/ProjectsPopup';
+import SkillsPopup from '../components/SkillsPopup';
+import LanguagesPopup from '../components/LanguagesPopup';
+import CertificationPopup from '../components/CertificationPopup';
 
 export default function Home() {
   return (
@@ -24,17 +25,19 @@ export default function Home() {
           <h2>Dane osobowe</h2>
           <PersonalDataForm />
           <h2>Profile</h2>
-          <ProfileForm />
+          <ProfilePopup />
           <h2>Doświadczenie</h2>
-          <ExperienceForm />
+          <ExperiencePopup />
           <h2>Edukacja</h2>
-          <EducationForm />
+          <EducationPopup />
           <h2>Projekty</h2>
-          <ProjectsForm />
+          <ProjectsPopup />
           <h2>Umiejętności</h2>
-          <SkillsForm />
+          <SkillsPopup />
+          <h2>Języki</h2>
+          <LanguagesPopup />
           <h2>Certyfikaty</h2>
-          <CertificationForm />
+          <CertificationPopup />
         </div>
 
         /* {/ Prawy panel – podgląd */

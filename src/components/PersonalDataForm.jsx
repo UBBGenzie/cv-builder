@@ -1,71 +1,73 @@
 'use client';
-import { useState } from 'react';
 import useCVStore from '../store/cvStore';
+import { useEffect, useState } from 'react';
 
 export default function PersonalDataForm() {
+  const personalData = useCVStore((state) => state.personalData);
   const setPersonalData = useCVStore((state) => state.setPersonalData);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    location: '',
-    portfolio: '',
-  });
+
+  const [formData, setFormData] = useState(personalData);
+
+  // autosave do Zustand przy każdej zmianie formData
+  useEffect(() => {
+    setPersonalData(formData);
+  }, [formData, setPersonalData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setPersonalData(formData);
-    console.log('Zapisano dane osobowe:', formData);
-  };
-
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-    >
+    <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <input
-        name="firstName"
-        placeholder="Imię"
+        name="fullName"
+        placeholder="Imię i nazwisko"
+        value={formData.fullName}
         onChange={handleChange}
-        value={formData.firstName}
       />
       <input
-        name="lastName"
-        placeholder="Nazwisko"
+        name="headline"
+        placeholder="Nagłówek (np. Frontend Developer)"
+        value={formData.headline}
         onChange={handleChange}
-        value={formData.lastName}
       />
       <input
         name="email"
         placeholder="Email"
-        onChange={handleChange}
         value={formData.email}
+        onChange={handleChange}
       />
       <input
         name="phone"
         placeholder="Telefon"
-        onChange={handleChange}
         value={formData.phone}
+        onChange={handleChange}
       />
       <input
         name="location"
         placeholder="Lokalizacja"
-        onChange={handleChange}
         value={formData.location}
+        onChange={handleChange}
       />
       <input
         name="portfolio"
         placeholder="Strona / portfolio"
-        onChange={handleChange}
         value={formData.portfolio}
+        onChange={handleChange}
       />
-      <button type="submit">Zapisz dane</button>
+      <input
+        name="picture"
+        placeholder="Link do zdjęcia"
+        value={formData.picture}
+        onChange={handleChange}
+      />
+      <textarea
+        name="summary"
+        placeholder="Podsumowanie / Bio"
+        value={formData.summary}
+        onChange={handleChange}
+      />
     </form>
   );
 }
