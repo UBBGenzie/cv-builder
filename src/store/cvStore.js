@@ -1,6 +1,11 @@
-import { create } from 'zustand';
+'use client';
 
-const useCVStore = create((set) => ({
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+let store;
+
+const storeConfig = (set) => ({
   personalData: {
     fullName: '',
     headline: '',
@@ -11,8 +16,7 @@ const useCVStore = create((set) => ({
     picture: '',
     summary: '',
   },
-  profile: {}, // dynamiczne profile jako obiekt { github: url, linkedin: url, ... }
-
+  profile: {},
   experience: [],
   education: [],
   certifications: [],
@@ -20,7 +24,6 @@ const useCVStore = create((set) => ({
   projects: [],
   languages: [],
 
-  // setters
   setPersonalData: (data) => set({ personalData: data }),
   setProfile: (data) => set({ profile: data }),
   setExperience: (data) => set({ experience: data }),
@@ -29,6 +32,22 @@ const useCVStore = create((set) => ({
   setSkills: (data) => set({ skills: data }),
   setProjects: (data) => set({ projects: data }),
   setLanguages: (data) => set({ languages: data }),
-}));
 
-export default useCVStore;
+  hasHydrated: false,
+  setHasHydrated: () => set({ hasHydrated: true }),
+});
+
+// twórz store tylko raz (w przeglądarce)
+store =
+  typeof window !== 'undefined'
+    ? create(
+        persist(storeConfig, {
+          name: 'cv-builder-storage',
+          onRehydrateStorage: () => (state) => {
+            state.setHasHydrated?.();
+          },
+        })
+      )
+    : create(storeConfig); // fallback dla SSR
+
+export default store;

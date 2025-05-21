@@ -1,17 +1,27 @@
 'use client';
-import useCVStore from '../store/cvStore';
+
 import { useEffect, useState } from 'react';
+import useCVStore from '../store/cvStore';
 
 export default function PersonalDataForm() {
   const personalData = useCVStore((state) => state.personalData);
   const setPersonalData = useCVStore((state) => state.setPersonalData);
+  const hasHydrated = useCVStore((state) => state.hasHydrated);
 
   const [formData, setFormData] = useState(personalData);
 
   // autosave do Zustand przy każdej zmianie formData
   useEffect(() => {
-    setPersonalData(formData);
-  }, [formData, setPersonalData]);
+    if (hasHydrated) {
+      setFormData(personalData); // załaduj dane po rehydratacji
+    }
+  }, [hasHydrated]);
+
+  useEffect(() => {
+    if (hasHydrated) {
+      setPersonalData(formData);
+    }
+  }, [formData, setPersonalData, hasHydrated]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,6 +39,8 @@ export default function PersonalDataForm() {
     };
     reader.readAsDataURL(file);
   };
+
+  if (!hasHydrated) return null;
 
   return (
     <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

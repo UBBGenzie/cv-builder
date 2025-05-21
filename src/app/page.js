@@ -10,6 +10,7 @@ import SkillsPopup from '../components/SkillsPopup';
 import LanguagesPopup from '../components/LanguagesPopup';
 import CertificationPopup from '../components/CertificationPopup';
 import dynamic from 'next/dynamic';
+import ResetCVButton from '../components/ResetCVButton';
 
 // PDF export – ładowany tylko po stronie klienta
 const PdfDownloadButton = dynamic(
@@ -31,6 +32,7 @@ export default function Home() {
           backgroundColor: '#f9f9f9',
         }}
       >
+        <ResetCVButton />
         <h2>Dane osobowe</h2>
         <PersonalDataForm />
         <h2>Profile</h2>
