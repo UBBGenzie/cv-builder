@@ -1,110 +1,153 @@
 'use client';
-import { useState } from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 import useCVStore from '../store/cvStore';
 import Popup from './Popup';
+import {
+  inputStyle,
+  labelStyle,
+  formStyle,
+  saveButtonStyle,
+  addButtonStyle,
+} from '../styles/formStyles';
 
-export default function EducationPopup() {
-  const education = useCVStore((state) => state.education);
-  const setEducation = useCVStore((state) => state.setEducation);
-
+const EducationPopup = forwardRef((props, ref) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const [editingIndex, setEditingIndex] = useState(null);
   const [formData, setFormData] = useState({
     school: '',
     degree: '',
     field: '',
-    mode: '',
     dateRange: '',
-    summary: '',
+    location: '',
+    description: '',
   });
+
+  const education = useCVStore((state) => state.education);
+  const setEducation = useCVStore((state) => state.setEducation);
+
+  useImperativeHandle(ref, () => ({
+    editItem: (index) => {
+      const item = education[index];
+      setFormData(item);
+      setEditingIndex(index);
+      setIsOpen(true);
+    },
+  }));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAdd = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.school || !formData.degree) return;
-    setEducation([...education, formData]);
+
+    if (editingIndex !== null) {
+      const updated = [...education];
+      updated[editingIndex] = formData;
+      setEducation(updated);
+    } else {
+      setEducation([...education, formData]);
+    }
+
     setFormData({
       school: '',
       degree: '',
       field: '',
-      mode: '',
       dateRange: '',
-      summary: '',
+      location: '',
+      description: '',
     });
+    setEditingIndex(null);
     setIsOpen(false);
   };
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} style={{ marginBottom: '1rem' }}>
-        Dodaj edukację
+      <button onClick={() => setIsOpen(true)} style={addButtonStyle}>
+        <span style={{ fontSize: '20px', lineHeight: 0 }}>＋</span> Dodaj
+        edukację
       </button>
 
       <Popup
-        title="Nowa edukacja"
+        title={editingIndex !== null ? 'Edytuj edukację' : 'Nowa edukacja'}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+          setEditingIndex(null);
+          setFormData({
+            school: '',
+            degree: '',
+            field: '',
+            dateRange: '',
+            location: '',
+            description: '',
+          });
+        }}
       >
-        <form
-          onSubmit={handleAdd}
-          style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-        >
-          <input
-            name="school"
-            placeholder="Uczelnia"
-            onChange={handleChange}
-            value={formData.school}
-          />
-          <input
-            name="degree"
-            placeholder="Stopień (np. Inżynier)"
-            onChange={handleChange}
-            value={formData.degree}
-          />
-          <input
-            name="field"
-            placeholder="Kierunek"
-            onChange={handleChange}
-            value={formData.field}
-          />
-          <input
-            name="mode"
-            placeholder="Tryb (np. stacjonarne)"
-            onChange={handleChange}
-            value={formData.mode}
-          />
-          <input
-            name="dateRange"
-            placeholder="Okres (np. 2021–2025)"
-            onChange={handleChange}
-            value={formData.dateRange}
-          />
-          <textarea
-            name="summary"
-            placeholder="Opis / podsumowanie"
-            onChange={handleChange}
-            value={formData.summary}
-          />
-          <button type="submit">Zapisz</button>
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <div>
+            <label style={labelStyle}>Szkoła</label>
+            <input
+              name="school"
+              value={formData.school}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Stopień</label>
+            <input
+              name="degree"
+              value={formData.degree}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Kierunek</label>
+            <input
+              name="field"
+              value={formData.field}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Okres</label>
+            <input
+              name="dateRange"
+              value={formData.dateRange}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Lokalizacja</label>
+            <input
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Opis</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              style={{ ...inputStyle, height: '100px' }}
+            />
+          </div>
+          <button type="submit" style={saveButtonStyle}>
+            Zapisz
+          </button>
         </form>
       </Popup>
-
-      {education.length > 0 && (
-        <div>
-          <h4>Dodane wpisy edukacji:</h4>
-          <ul>
-            {education.map((edu, i) => (
-              <li key={i}>
-                <strong>{edu.degree}</strong> – {edu.field} ({edu.dateRange})
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </>
   );
-}
+});
+
+export default EducationPopup;

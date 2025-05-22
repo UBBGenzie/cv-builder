@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import useCVStore from '../store/cvStore';
+import { Trash2 } from 'lucide-react';
 
 export default function PersonalDataForm() {
   const personalData = useCVStore((state) => state.personalData);
@@ -10,10 +11,9 @@ export default function PersonalDataForm() {
 
   const [formData, setFormData] = useState(personalData);
 
-  // autosave do Zustand przy każdej zmianie formData
   useEffect(() => {
     if (hasHydrated) {
-      setFormData(personalData); // załaduj dane po rehydratacji
+      setFormData(personalData);
     }
   }, [hasHydrated]);
 
@@ -40,56 +40,191 @@ export default function PersonalDataForm() {
     reader.readAsDataURL(file);
   };
 
+  const handleRemovePhoto = () => {
+    setFormData((prev) => ({ ...prev, picture: '' }));
+  };
+
   if (!hasHydrated) return null;
 
+  const inputStyle = {
+    fontSize: '16px',
+    padding: '0.5rem',
+    borderRadius: '4px',
+    border: '1px solid #333',
+    backgroundColor: '#1e1e1e',
+    color: '#FAFAFA',
+    width: '100%',
+  };
+
+  const labelStyle = {
+    display: 'block',
+    fontSize: '14px',
+    marginBottom: '0.5rem',
+    color: '#FAFAFA',
+  };
+
+  const fileButtonStyle = {
+    marginTop: '0.5rem',
+    display: 'inline-block',
+    padding: '0.5rem 1rem',
+    backgroundColor: '#333',
+    color: '#FAFAFA',
+    border: '1px solid #555',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    textAlign: 'center',
+    fontSize: '14px',
+  };
+
+  const fileInputHidden = {
+    display: 'none',
+  };
+
   return (
-    <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <input
-        name="fullName"
-        placeholder="Imię i nazwisko"
-        value={formData.fullName}
-        onChange={handleChange}
-      />
-      <input
-        name="headline"
-        placeholder="Nagłówek (np. Frontend Developer)"
-        value={formData.headline}
-        onChange={handleChange}
-      />
-      <input
-        name="email"
-        placeholder="Email"
-        value={formData.email}
-        onChange={handleChange}
-      />
-      <input
-        name="phone"
-        placeholder="Telefon"
-        value={formData.phone}
-        onChange={handleChange}
-      />
-      <input
-        name="location"
-        placeholder="Lokalizacja"
-        value={formData.location}
-        onChange={handleChange}
-      />
-      <input
-        name="portfolio"
-        placeholder="Strona / portfolio"
-        value={formData.portfolio}
-        onChange={handleChange}
-      />
-      <label>
-        Zdjęcie (plik):
-        <input type="file" accept="image/*" onChange={handleFileUpload} />
-      </label>
-      <textarea
-        name="summary"
-        placeholder="Podsumowanie / Bio"
-        value={formData.summary}
-        onChange={handleChange}
-      />
+    <form style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      <div>
+        <label style={labelStyle}>Imię i nazwisko</label>
+        <input
+          name="fullName"
+          value={formData.fullName}
+          onChange={handleChange}
+          style={inputStyle}
+        />
+      </div>
+
+      <div>
+        <label style={labelStyle}>Nagłówek (np. Frontend Developer)</label>
+        <input
+          name="headline"
+          value={formData.headline}
+          onChange={handleChange}
+          style={inputStyle}
+        />
+      </div>
+
+      {/* Email + Portfolio w jednej linii */}
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ flex: 1 }}>
+          <label style={labelStyle}>Email</label>
+          <input
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <label style={labelStyle}>Strona / portfolio</label>
+          <input
+            name="portfolio"
+            value={formData.portfolio}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+        </div>
+      </div>
+
+      {/* Telefon + Lokalizacja w jednej linii */}
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ flex: 1 }}>
+          <label style={labelStyle}>Telefon</label>
+          <input
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <label style={labelStyle}>Lokalizacja</label>
+          <input
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+        </div>
+      </div>
+
+      {/* Zdjęcie */}
+      <div>
+        <label style={labelStyle}>Zdjęcie</label>
+        {formData.picture ? (
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+          >
+            <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
+              <img
+                src={formData.picture}
+                alt="Zdjęcie"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  objectFit: 'cover',
+                  borderRadius: '4px',
+                  border: '1px solid #444',
+                }}
+              />
+            </label>
+            <div
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            >
+              <label htmlFor="file-upload" style={fileButtonStyle}>
+                Zmień zdjęcie
+              </label>
+              <button
+                type="button"
+                onClick={handleRemovePhoto}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#f87171',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: 0,
+                }}
+                title="Usuń zdjęcie"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              style={fileInputHidden}
+            />
+          </div>
+        ) : (
+          <>
+            <div style={{ marginTop: '0.5rem' }}>
+              <label htmlFor="file-upload" style={fileButtonStyle}>
+                Wybierz plik
+              </label>
+            </div>
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              style={fileInputHidden}
+            />
+          </>
+        )}
+      </div>
+
+      {/* Podsumowanie */}
+      <div>
+        <label style={labelStyle}>Podsumowanie / Bio</label>
+        <textarea
+          name="summary"
+          value={formData.summary}
+          onChange={handleChange}
+          style={{ ...inputStyle, height: '120px' }}
+        />
+      </div>
     </form>
   );
 }
