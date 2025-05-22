@@ -1,112 +1,156 @@
+// ExperiencePopup.jsx
 'use client';
-import { useState } from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 import useCVStore from '../store/cvStore';
 import Popup from './Popup';
+import {
+  inputStyle,
+  labelStyle,
+  formStyle,
+  saveButtonStyle,
+  addButtonStyle,
+} from '../styles/formStyles';
 
-export default function ExperiencePopup() {
-  const experience = useCVStore((state) => state.experience);
-  const setExperience = useCVStore((state) => state.setExperience);
-
+const ExperiencePopup = forwardRef((props, ref) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const [editingIndex, setEditingIndex] = useState(null);
   const [formData, setFormData] = useState({
     position: '',
     company: '',
-    location: '',
     dateRange: '',
+    location: '',
     link: '',
     description: '',
   });
+
+  const experience = useCVStore((state) => state.experience);
+  const setExperience = useCVStore((state) => state.setExperience);
+
+  useImperativeHandle(ref, () => ({
+    editItem: (index) => {
+      const item = experience[index];
+      setFormData(item);
+      setEditingIndex(index);
+      setIsOpen(true);
+    },
+  }));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAdd = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.position || !formData.company) return;
-    setExperience([...experience, formData]);
+
+    if (editingIndex !== null) {
+      const updated = [...experience];
+      updated[editingIndex] = formData;
+      setExperience(updated);
+    } else {
+      setExperience([...experience, formData]);
+    }
+
     setFormData({
       position: '',
       company: '',
-      location: '',
       dateRange: '',
+      location: '',
       link: '',
       description: '',
     });
+    setEditingIndex(null);
     setIsOpen(false);
   };
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} style={{ marginBottom: '1rem' }}>
-        Dodaj doświadczenie
+      <button onClick={() => setIsOpen(true)} style={addButtonStyle}>
+        <span style={{ fontSize: '20px', lineHeight: 0 }}>＋</span> Dodaj
+        doświadczenie
       </button>
 
       <Popup
-        title="Nowe doświadczenie"
+        title={
+          editingIndex !== null ? 'Edytuj doświadczenie' : 'Nowe doświadczenie'
+        }
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+          setEditingIndex(null);
+          setFormData({
+            position: '',
+            company: '',
+            dateRange: '',
+            location: '',
+            link: '',
+            description: '',
+          });
+        }}
       >
-        <form
-          onSubmit={handleAdd}
-          style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-        >
-          <input
-            name="position"
-            placeholder="Stanowisko"
-            onChange={handleChange}
-            value={formData.position}
-          />
-          <input
-            name="company"
-            placeholder="Firma / Projekt"
-            onChange={handleChange}
-            value={formData.company}
-          />
-          <input
-            name="location"
-            placeholder="Lokalizacja"
-            onChange={handleChange}
-            value={formData.location}
-          />
-          <input
-            name="dateRange"
-            placeholder="Okres (np. 2022–2023)"
-            onChange={handleChange}
-            value={formData.dateRange}
-          />
-          <input
-            name="link"
-            placeholder="Link (np. GitHub)"
-            onChange={handleChange}
-            value={formData.link}
-          />
-          <textarea
-            name="description"
-            placeholder="Opis"
-            onChange={handleChange}
-            value={formData.description}
-          />
-          <button type="submit">Zapisz</button>
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <div>
+            <label style={labelStyle}>Stanowisko</label>
+            <input
+              name="position"
+              value={formData.position}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Firma</label>
+            <input
+              name="company"
+              value={formData.company}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Okres</label>
+            <input
+              name="dateRange"
+              value={formData.dateRange}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Lokalizacja</label>
+            <input
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Link</label>
+            <input
+              name="link"
+              value={formData.link}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Opis</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              style={{ ...inputStyle, height: '100px' }}
+            />
+          </div>
+          <button type="submit" style={saveButtonStyle}>
+            Zapisz
+          </button>
         </form>
       </Popup>
-
-      {/* Podgląd dodanych */}
-      {experience.length > 0 && (
-        <div>
-          <h4>Dodane doświadczenia:</h4>
-          <ul>
-            {experience.map((exp, i) => (
-              <li key={i}>
-                <strong>{exp.position}</strong> w {exp.company} ({exp.dateRange}
-                )
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </>
   );
-}
+});
+
+export default ExperiencePopup;

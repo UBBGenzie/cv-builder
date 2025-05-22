@@ -1,6 +1,13 @@
 'use client';
 import useCVStore from '../store/cvStore';
 
+const sectionHeadingStyle = {
+  fontSize: '18px',
+  marginBottom: '0.25rem',
+  borderBottom: '2px solid red',
+  paddingBottom: '0.25rem',
+};
+
 export default function CVPreview() {
   const {
     personalData,
@@ -14,7 +21,15 @@ export default function CVPreview() {
   } = useCVStore();
 
   return (
-    <div id="cv-preview" style={{ fontFamily: 'sans-serif' }}>
+    <div
+      id="cv-preview"
+      style={{
+        fontFamily: 'sans-serif',
+        color: '#000',
+        WebkitPrintColorAdjust: 'exact',
+        printColorAdjust: 'exact',
+      }}
+    >
       {/* NAGŁÓWEK – zdjęcie i dane */}
       <div
         style={{
@@ -69,139 +84,170 @@ export default function CVPreview() {
         <p style={{ marginBottom: '2rem' }}>{personalData.summary}</p>
       )}
 
-      <hr style={{ margin: '1.5rem 0' }} />
+      {/* <hr style={{ margin: '1.5rem 0' }} /> */}
 
-      {/* Profiles */}
-      {Object.entries(profile).filter(([_, url]) => url?.trim()).length > 0 && (
-        <>
-          <h3>Profiles</h3>
-          <ul>
-            {Object.entries(profile)
-              .filter(([_, url]) => url?.trim() !== '')
-              .map(([network, url], i) => (
-                <li key={i}>
-                  <strong>{network}</strong>: <a href={url}>{url}</a>
-                </li>
+      {/* DWIE KOLUMNY */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '2rem',
+        }}
+      >
+        {/* Lewa kolumna – główna treść */}
+        <div style={{ flex: 3 }}>
+          {experience.length > 0 && (
+            <>
+              <h3 style={sectionHeadingStyle}>Doświadczenie</h3>
+              {experience.map((item, i) => (
+                <div
+                  key={i}
+                  style={{
+                    pageBreakInside: 'avoid',
+                    breakInside: 'avoid',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <strong>{item.position}</strong> @ {item.company} (
+                  {item.dateRange})<br />
+                  <small>{item.location}</small>
+                  <br />
+                  {item.link && <a href={item.link}>{item.link}</a>}
+                  <p>{item.description}</p>
+                </div>
               ))}
-          </ul>
-        </>
-      )}
+            </>
+          )}
 
-      {/* Experience */}
-      {experience.length > 0 && (
-        <>
-          <h3>Experience</h3>
-          {experience.map((item, i) => (
-            <div key={i}>
-              <strong>{item.position}</strong> @ {item.company} (
-              {item.dateRange})<br />
-              <small>{item.location}</small>
-              <br />
-              {item.link && <a href={item.link}>{item.link}</a>}
-              <p>{item.description}</p>
-            </div>
-          ))}
-        </>
-      )}
+          {education.length > 0 && (
+            <>
+              <h3 style={sectionHeadingStyle}>Edukacja</h3>
+              {education.map((edu, i) => (
+                <div
+                  key={i}
+                  style={{
+                    pageBreakInside: 'avoid',
+                    breakInside: 'avoid',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <strong>{edu.degree}</strong> – {edu.field} ({edu.dateRange})
+                  <br />
+                  {edu.school} ({edu.mode})<br />
+                  {edu.summary && <p>{edu.summary}</p>}
+                </div>
+              ))}
+            </>
+          )}
 
-      {/* Education */}
-      {education.length > 0 && (
-        <>
-          <h3>Education</h3>
-          {education.map((edu, i) => (
-            <div key={i}>
-              <strong>{edu.degree}</strong> – {edu.field} ({edu.dateRange})
-              <br />
-              {edu.school} ({edu.mode})<br />
-              {edu.summary && <p>{edu.summary}</p>}
-            </div>
-          ))}
-        </>
-      )}
+          {projects.length > 0 && (
+            <>
+              <h3 style={sectionHeadingStyle}>Projekty</h3>
+              {projects.map((proj, i) => (
+                <div
+                  key={i}
+                  style={{
+                    pageBreakInside: 'avoid',
+                    breakInside: 'avoid',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <strong>{proj.name}</strong> ({proj.date})<br />
+                  {proj.description}
+                  <br />
+                  <em>{proj.techStack}</em>
+                  <br />
+                  {proj.link && <a href={proj.link}>{proj.link}</a>}
+                  <br />
+                  {proj.summary && <p>{proj.summary}</p>}
+                </div>
+              ))}
+            </>
+          )}
+        </div>
 
-      {/* Projects */}
-      {projects.length > 0 && (
-        <>
-          <h3>Projects</h3>
-          {projects.map((proj, i) => (
-            <div key={i}>
-              <strong>{proj.name}</strong> ({proj.date})<br />
-              {proj.description}
-              <br />
-              <em>{proj.techStack}</em>
-              <br />
-              {proj.link && <a href={proj.link}>{proj.link}</a>}
-              <br />
-              {proj.summary && <p>{proj.summary}</p>}
-            </div>
-          ))}
-        </>
-      )}
+        {/* Prawa kolumna – boczne informacje */}
+        <div style={{ flex: 1 }}>
+          {Object.entries(profile).filter(
+            ([_, value]) =>
+              typeof value?.url === 'string' && value.url.trim() !== ''
+          ).length > 0 && (
+            <>
+              <h3 style={sectionHeadingStyle}>Profile</h3>
+              <ul>
+                {Object.entries(profile)
+                  .filter(
+                    ([_, value]) =>
+                      typeof value?.url === 'string' && value.url.trim() !== ''
+                  )
+                  .map(([network, value], i) => (
+                    <li key={i}>
+                      <strong>{network}</strong>:{' '}
+                      <a href={value.url}>{value.url}</a>
+                    </li>
+                  ))}
+              </ul>
+            </>
+          )}
 
-      {/* Skills */}
-      {skills.length > 0 && (
-        <>
-          <h3>Skills</h3>
-          <ul
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '0.5rem',
-              listStyle: 'none',
-              padding: 0,
-            }}
-          >
-            {skills.map((s, i) => (
-              <li
-                key={i}
-                style={{
-                  background: '#eee',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '20px',
-                  textAlign: 'center',
-                }}
-              >
-                <strong>{s.name}</strong>
-                <br />
-                {s.description}
-                <br />
-                {renderLevelDots(s.level)}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+          {skills.length > 0 && (
+            <>
+              <h3 style={sectionHeadingStyle}>Umiejętności</h3>
+              <ul>
+                {skills.map((s, i) => (
+                  <li key={i}>
+                    <strong>{s.name}</strong>
+                    <br />
+                    {renderLevelDots(s.level)}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
 
-      {/* Languages */}
-      {languages.length > 0 && (
-        <>
-          <h3>Languages</h3>
-          <ul>
-            {languages.map((lang, i) => (
-              <li key={i}>
-                <strong>{lang.name}</strong> {lang.description}
-                <br />
-                {renderLevelDots(lang.level)}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+          {languages.length > 0 && (
+            <>
+              <h3 style={sectionHeadingStyle}>Języki</h3>
+              <ul>
+                {languages.map((lang, i) => (
+                  <li key={i}>
+                    <strong>{lang.name}</strong>
+                    <br />
+                    {renderLevelDots(lang.level)}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
 
-      {/* Certifications */}
-      {certifications.length > 0 && (
-        <>
-          <h3>Certifications</h3>
-          {certifications.map((cert, i) => (
-            <div key={i}>
-              <strong>{cert.title}</strong> – {cert.issuer} ({cert.date})<br />
-              {cert.link && <a href={cert.link}>{cert.link}</a>}
-              <br />
-              {cert.description && <p>{cert.description}</p>}
-            </div>
-          ))}
-        </>
-      )}
+          {certifications.length > 0 && (
+            <>
+              <h3 style={sectionHeadingStyle}>Certyfikaty</h3>
+              {certifications.map((cert, i) => (
+                <div
+                  key={i}
+                  style={{
+                    pageBreakInside: 'avoid',
+                    breakInside: 'avoid',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <strong>{cert.title}</strong> – {cert.issuer} ({cert.date})
+                  <br />
+                  {cert.link && (
+                    <>
+                      <a href={cert.link}>{cert.link}</a>
+                      <br />
+                    </>
+                  )}
+                  <br />
+                  {cert.description && <p>{cert.description}</p>}
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -217,7 +263,8 @@ function renderLevelDots(level) {
         height: '12px',
         borderRadius: '50%',
         marginRight: '4px',
-        backgroundColor: i < level ? '#333' : '#ccc',
+        backgroundColor: i < level ? 'red' : '#fff',
+        border: '1px solid red',
       }}
     />
   ));

@@ -1,110 +1,129 @@
 'use client';
-import { useState } from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 import useCVStore from '../store/cvStore';
 import Popup from './Popup';
+import {
+  inputStyle,
+  labelStyle,
+  formStyle,
+  saveButtonStyle,
+  addButtonStyle,
+} from '../styles/formStyles';
 
-export default function ProjectsPopup() {
+const ProjectsPopup = forwardRef((props, ref) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const [editingIndex, setEditingIndex] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
-    techStack: '',
     link: '',
-    date: '',
-    summary: '',
+    dateRange: '',
+    description: '',
   });
 
   const projects = useCVStore((state) => state.projects);
   const setProjects = useCVStore((state) => state.setProjects);
+
+  useImperativeHandle(ref, () => ({
+    editItem: (index) => {
+      const item = projects[index];
+      setFormData(item);
+      setEditingIndex(index);
+      setIsOpen(true);
+    },
+  }));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAdd = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.description) return;
-    setProjects([...projects, formData]);
+    if (!formData.name) return;
+
+    if (editingIndex !== null) {
+      const updated = [...projects];
+      updated[editingIndex] = formData;
+      setProjects(updated);
+    } else {
+      setProjects([...projects, formData]);
+    }
+
     setFormData({
       name: '',
-      description: '',
-      techStack: '',
       link: '',
-      date: '',
-      summary: '',
+      dateRange: '',
+      description: '',
     });
+    setEditingIndex(null);
     setIsOpen(false);
   };
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} style={{ marginBottom: '1rem' }}>
-        Dodaj projekt
+      <button onClick={() => setIsOpen(true)} style={addButtonStyle}>
+        <span style={{ fontSize: '20px', lineHeight: 0 }}>＋</span> Dodaj
+        projekt
       </button>
 
       <Popup
-        title="Nowy projekt"
+        title={editingIndex !== null ? 'Edytuj projekt' : 'Nowy projekt'}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+          setEditingIndex(null);
+          setFormData({
+            name: '',
+            link: '',
+            dateRange: '',
+            description: '',
+          });
+        }}
       >
-        <form
-          onSubmit={handleAdd}
-          style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-        >
-          <input
-            name="name"
-            placeholder="Nazwa projektu"
-            onChange={handleChange}
-            value={formData.name}
-          />
-          <textarea
-            name="description"
-            placeholder="Opis projektu"
-            onChange={handleChange}
-            value={formData.description}
-          />
-          <input
-            name="techStack"
-            placeholder="Technologie (np. React, Node.js)"
-            onChange={handleChange}
-            value={formData.techStack}
-          />
-          <input
-            name="link"
-            placeholder="Link (np. GitHub, demo)"
-            onChange={handleChange}
-            value={formData.link}
-          />
-          <input
-            name="date"
-            placeholder="Data / okres (np. 2023)"
-            onChange={handleChange}
-            value={formData.date}
-          />
-          <textarea
-            name="summary"
-            placeholder="Podsumowanie projektu"
-            onChange={handleChange}
-            value={formData.summary}
-          />
-          <button type="submit">Zapisz</button>
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <div>
+            <label style={labelStyle}>Nazwa projektu</label>
+            <input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Link</label>
+            <input
+              name="link"
+              value={formData.link}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Okres</label>
+            <input
+              name="dateRange"
+              value={formData.dateRange}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Opis</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              style={{ ...inputStyle, height: '100px' }}
+            />
+          </div>
+          <button type="submit" style={saveButtonStyle}>
+            Zapisz
+          </button>
         </form>
       </Popup>
-
-      {projects.length > 0 && (
-        <div>
-          <h4>Dodane projekty:</h4>
-          <ul>
-            {projects.map((p, i) => (
-              <li key={i}>
-                <strong>{p.name}</strong> ({p.date}) – {p.techStack}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </>
   );
-}
+});
+
+export default ProjectsPopup;

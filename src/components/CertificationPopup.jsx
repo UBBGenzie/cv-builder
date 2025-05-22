@@ -1,103 +1,143 @@
 'use client';
-import { useState } from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 import useCVStore from '../store/cvStore';
 import Popup from './Popup';
+import {
+  inputStyle,
+  labelStyle,
+  formStyle,
+  saveButtonStyle,
+  addButtonStyle,
+} from '../styles/formStyles';
 
-export default function CertificationPopup() {
+const CertificationPopup = forwardRef((props, ref) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const [editingIndex, setEditingIndex] = useState(null);
   const [formData, setFormData] = useState({
-    title: '',
+    name: '',
     issuer: '',
     date: '',
-    link: '',
     description: '',
+    link: '',
   });
 
   const certifications = useCVStore((state) => state.certifications);
   const setCertifications = useCVStore((state) => state.setCertifications);
+
+  useImperativeHandle(ref, () => ({
+    editItem: (index) => {
+      const item = certifications[index];
+      setFormData(item);
+      setEditingIndex(index);
+      setIsOpen(true);
+    },
+  }));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAdd = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.title || !formData.issuer) return;
-    setCertifications([...certifications, formData]);
+    if (!formData.name) return;
+
+    if (editingIndex !== null) {
+      const updated = [...certifications];
+      updated[editingIndex] = formData;
+      setCertifications(updated);
+    } else {
+      setCertifications([...certifications, formData]);
+    }
+
     setFormData({
-      title: '',
+      name: '',
       issuer: '',
       date: '',
-      link: '',
       description: '',
+      link: '',
     });
+    setEditingIndex(null);
     setIsOpen(false);
   };
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} style={{ marginBottom: '1rem' }}>
-        Dodaj certyfikat
+      <button onClick={() => setIsOpen(true)} style={addButtonStyle}>
+        <span style={{ fontSize: '20px', lineHeight: 0 }}>＋</span> Dodaj
+        certyfikat
       </button>
 
       <Popup
-        title="Nowy certyfikat"
+        title={editingIndex !== null ? 'Edytuj certyfikat' : 'Nowy certyfikat'}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+          setEditingIndex(null);
+          setFormData({
+            name: '',
+            issuer: '',
+            date: '',
+            description: '',
+            link: '',
+          });
+        }}
       >
-        <form
-          onSubmit={handleAdd}
-          style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-        >
-          <input
-            name="title"
-            placeholder="Tytuł certyfikatu"
-            onChange={handleChange}
-            value={formData.title}
-          />
-          <input
-            name="issuer"
-            placeholder="Organizator (np. Udemy)"
-            onChange={handleChange}
-            value={formData.issuer}
-          />
-          <input
-            name="date"
-            placeholder="Data (np. 2024-05)"
-            onChange={handleChange}
-            value={formData.date}
-          />
-          <input
-            name="link"
-            placeholder="Link do certyfikatu"
-            onChange={handleChange}
-            value={formData.link}
-          />
-          <textarea
-            name="description"
-            placeholder="Opis certyfikatu"
-            onChange={handleChange}
-            value={formData.description}
-          />
-          <button type="submit">Zapisz</button>
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <div>
+            <label style={labelStyle}>Nazwa</label>
+            <input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Organizator</label>
+            <input
+              name="issuer"
+              value={formData.issuer}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Data</label>
+            <input
+              name="date"
+              type="date"
+              value={formData.date}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Link</label>
+            <input
+              name="link"
+              value={formData.link}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Opis</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              style={{ ...inputStyle, height: '100px' }}
+            />
+          </div>
+          <button type="submit" style={saveButtonStyle}>
+            Zapisz
+          </button>
         </form>
       </Popup>
-
-      {certifications.length > 0 && (
-        <>
-          <h3>Certifications</h3>
-          {certifications.map((cert, i) => (
-            <div key={i} style={{ marginBottom: '1rem' }}>
-              <strong>{cert.title}</strong> – {cert.issuer} ({cert.date})<br />
-              {cert.link && <a href={cert.link}>{cert.link}</a>}
-              <br />
-              {cert.description && <p>{cert.description}</p>}
-            </div>
-          ))}
-        </>
-      )}
     </>
   );
-}
+});
+
+export default CertificationPopup;

@@ -1,6 +1,6 @@
 'use client';
-
 import useCVStore from '../store/cvStore';
+import { Trash2 } from 'lucide-react';
 
 export default function ResetCVButton() {
   const resetCV = useCVStore((state) => state.resetCV);
@@ -8,28 +8,33 @@ export default function ResetCVButton() {
 
   const handleReset = () => {
     if (confirm('Czy na pewno chcesz wyczyścić wszystkie dane CV?')) {
-      resetCV?.(); // zabezpieczenie
+      resetCV?.();
       localStorage.removeItem('cv-builder-storage');
-      window.location.reload(); // reload, aby odczytać pusty Zustand
+      window.location.reload();
     }
   };
 
-  if (!hasHydrated) return null; // czekamy na odczyt z localStorage
+  if (!hasHydrated) return null;
 
   return (
     <button
       onClick={handleReset}
+      title="Wyczyść dane"
       style={{
-        marginTop: '2rem',
-        backgroundColor: '#ffcccc',
-        padding: '0.5rem 1rem',
-        border: '1px solid #ff0000',
-        borderRadius: '4px',
-        fontWeight: 'bold',
+        background: 'transparent',
+        border: 'none',
+        color: '#FAFAFA',
         cursor: 'pointer',
+        padding: '0.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '2.75rem',
+        width: '2.75rem',
+        borderRadius: '6px',
       }}
     >
-      🧹 Wyczyść dane CV
+      <Trash2 size={28} />
     </button>
   );
 }
