@@ -5,7 +5,7 @@ import { persist } from 'zustand/middleware';
 
 let store;
 
-const storeConfig = (set) => ({
+const getInitialState = () => ({
   personalData: {
     fullName: '',
     headline: '',
@@ -23,6 +23,11 @@ const storeConfig = (set) => ({
   skills: [],
   projects: [],
   languages: [],
+  hasHydrated: false,
+});
+
+const storeConfig = (set) => ({
+  ...getInitialState(),
 
   setPersonalData: (data) => set({ personalData: data }),
   setProfile: (data) => set({ profile: data }),
@@ -33,8 +38,8 @@ const storeConfig = (set) => ({
   setProjects: (data) => set({ projects: data }),
   setLanguages: (data) => set({ languages: data }),
 
-  hasHydrated: false,
   setHasHydrated: () => set({ hasHydrated: true }),
+  resetCV: () => set(getInitialState()),
 });
 
 // twórz store tylko raz (w przeglądarce)
