@@ -11,10 +11,8 @@ export const inputStyle = {
 };
 
 export const labelStyle = {
-  marginBottom: '0.5rem', // 👈 dodane
-
+  marginBottom: '0.5rem',
   fontSize: '14px',
-  marginBottom: '0.25rem',
   color: '#FAFAFA',
 };
 
