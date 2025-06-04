@@ -17,6 +17,7 @@ import LanguagesPopup from '../components/LanguagesPopup';
 import LanguagesList from '../components/LanguagesList';
 import CertificationPopup from '../components/CertificationPopup';
 import CertificationsList from '../components/CertificationsList';
+import AppearanceForm from '../components/AppearanceForm';
 import dynamic from 'next/dynamic';
 import ResetCVButton from '../components/ResetCVButton';
 import Section from '../components/Section';
@@ -29,6 +30,7 @@ import {
   Award,
   Globe,
   Brain,
+  Palette,
   Maximize2,
   Minimize2,
 } from 'lucide-react';
@@ -155,6 +157,9 @@ export default function Home() {
           <Section title="Certyfikaty" icon={Award}>
             <CertificationPopup ref={certificationPopupRef} />
             <CertificationsList popupRef={certificationPopupRef} />
+          </Section>
+          <Section title="Wygląd" icon={Palette}>
+            <AppearanceForm />
           </Section>
         </div>
 

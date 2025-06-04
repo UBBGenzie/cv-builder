@@ -23,6 +23,12 @@ const getInitialState = () => ({
   skills: [],
   projects: [],
   languages: [],
+  appearance: {
+    color: '#dc2626', // red-600
+    font: 'Arial',
+    fontSize: 14,
+    lineHeight: 1.4,
+  },
   hasHydrated: false,
 });
 
@@ -37,6 +43,7 @@ const storeConfig = (set) => ({
   setSkills: (data) => set({ skills: data }),
   setProjects: (data) => set({ projects: data }),
   setLanguages: (data) => set({ languages: data }),
+  setAppearance: (data) => set({ appearance: data }),
 
   setHasHydrated: () => set({ hasHydrated: true }),
   resetCV: () => set(getInitialState()),
