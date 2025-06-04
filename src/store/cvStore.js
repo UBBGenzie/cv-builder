@@ -33,6 +33,27 @@ const storeConfig = (set) => ({
   setProjects: (data) => set({ projects: data }),
   setLanguages: (data) => set({ languages: data }),
 
+  resetCV: () =>
+    set({
+      personalData: {
+        fullName: '',
+        headline: '',
+        email: '',
+        phone: '',
+        location: '',
+        portfolio: '',
+        picture: '',
+        summary: '',
+      },
+      profile: {},
+      experience: [],
+      education: [],
+      certifications: [],
+      skills: [],
+      projects: [],
+      languages: [],
+    }),
+
   hasHydrated: false,
   setHasHydrated: () => set({ hasHydrated: true }),
 });
