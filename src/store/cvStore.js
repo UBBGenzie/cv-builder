@@ -50,11 +50,27 @@ const storeConfig = (set) => ({
 });
 
 // twórz store tylko raz (w przeglądarce)
+const dynamicLocalStorage = {
+  getItem: (name) => {
+    const email = window.localStorage.getItem('cv-builder-email') || 'anonymous';
+    return window.localStorage.getItem(`${name}-${email}`);
+  },
+  setItem: (name, value) => {
+    const email = window.localStorage.getItem('cv-builder-email') || 'anonymous';
+    window.localStorage.setItem(`${name}-${email}`, value);
+  },
+  removeItem: (name) => {
+    const email = window.localStorage.getItem('cv-builder-email') || 'anonymous';
+    window.localStorage.removeItem(`${name}-${email}`);
+  },
+};
+
 store =
   typeof window !== 'undefined'
     ? create(
         persist(storeConfig, {
           name: 'cv-builder-storage',
+          storage: dynamicLocalStorage,
           onRehydrateStorage: () => (state) => {
             state.setHasHydrated?.();
           },
