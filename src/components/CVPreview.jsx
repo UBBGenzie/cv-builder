@@ -1,12 +1,14 @@
 'use client';
 import useCVStore from '../store/cvStore';
 
-const sectionHeadingStyle = {
-  fontSize: '18px',
-  marginBottom: '0.25rem',
-  borderBottom: '2px solid red',
-  paddingBottom: '0.25rem',
-};
+function getSectionHeadingStyle(color) {
+  return {
+    fontSize: '18px',
+    marginBottom: '0.25rem',
+    borderBottom: `2px solid ${color}`,
+    paddingBottom: '0.25rem',
+  };
+}
 
 export default function CVPreview() {
   const {
@@ -18,13 +20,18 @@ export default function CVPreview() {
     skills,
     languages,
     certifications,
+    appearance,
   } = useCVStore();
+
+  const sectionHeadingStyle = getSectionHeadingStyle(appearance.color);
 
   return (
     <div
       id="cv-preview"
       style={{
-        fontFamily: 'sans-serif',
+        fontFamily: appearance.font,
+        fontSize: `${appearance.fontSize}px`,
+        lineHeight: appearance.lineHeight,
         color: '#000',
         WebkitPrintColorAdjust: 'exact',
         printColorAdjust: 'exact',
@@ -198,7 +205,7 @@ export default function CVPreview() {
                   <li key={i}>
                     <strong>{s.name}</strong>
                     <br />
-                    {renderLevelDots(s.level)}
+                    {renderLevelDots(s.level, appearance.color)}
                   </li>
                 ))}
               </ul>
@@ -213,7 +220,7 @@ export default function CVPreview() {
                   <li key={i}>
                     <strong>{lang.name}</strong>
                     <br />
-                    {renderLevelDots(lang.level)}
+                    {renderLevelDots(lang.level, appearance.color)}
                   </li>
                 ))}
               </ul>
@@ -252,7 +259,7 @@ export default function CVPreview() {
   );
 }
 
-function renderLevelDots(level) {
+function renderLevelDots(level, color = 'red') {
   const total = 5;
   return Array.from({ length: total }, (_, i) => (
     <span
@@ -263,8 +270,8 @@ function renderLevelDots(level) {
         height: '12px',
         borderRadius: '50%',
         marginRight: '4px',
-        backgroundColor: i < level ? 'red' : '#fff',
-        border: '1px solid red',
+        backgroundColor: i < level ? color : '#fff',
+        border: `1px solid ${color}`,
       }}
     />
   ));
