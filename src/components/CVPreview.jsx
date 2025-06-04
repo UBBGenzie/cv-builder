@@ -134,7 +134,7 @@ export default function CVPreview() {
                   <strong>{edu.degree}</strong> – {edu.field} ({edu.dateRange})
                   <br />
                   {edu.school} ({edu.mode})<br />
-                  {edu.summary && <p>{edu.summary}</p>}
+                  {edu.description && <p>{edu.description}</p>}
                 </div>
               ))}
             </>
@@ -152,14 +152,10 @@ export default function CVPreview() {
                     marginBottom: '1rem',
                   }}
                 >
-                  <strong>{proj.name}</strong> ({proj.date})<br />
+                  <strong>{proj.name}</strong> ({proj.dateRange})<br />
                   {proj.description}
                   <br />
-                  <em>{proj.techStack}</em>
-                  <br />
                   {proj.link && <a href={proj.link}>{proj.link}</a>}
-                  <br />
-                  {proj.summary && <p>{proj.summary}</p>}
                 </div>
               ))}
             </>

@@ -5,7 +5,7 @@ import { persist } from 'zustand/middleware';
 
 let store;
 
-const storeConfig = (set) => ({
+const defaultState = {
   personalData: {
     fullName: '',
     headline: '',
@@ -23,6 +23,10 @@ const storeConfig = (set) => ({
   skills: [],
   projects: [],
   languages: [],
+};
+
+const storeConfig = (set) => ({
+  ...defaultState,
 
   setPersonalData: (data) => set({ personalData: data }),
   setProfile: (data) => set({ profile: data }),
@@ -32,6 +36,8 @@ const storeConfig = (set) => ({
   setSkills: (data) => set({ skills: data }),
   setProjects: (data) => set({ projects: data }),
   setLanguages: (data) => set({ languages: data }),
+
+  resetCV: () => set(defaultState),
 
   hasHydrated: false,
   setHasHydrated: () => set({ hasHydrated: true }),
